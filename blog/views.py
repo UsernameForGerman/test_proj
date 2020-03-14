@@ -3,6 +3,8 @@ from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.urls import reverse_lazy
 from .models import Subscription, Post, User
 from django.views import View
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 
 class UserView(View):
     template_name = 'blog/blog_user_account.html'
@@ -11,9 +13,13 @@ class UserView(View):
     def get(self, request, username, *args, **kwargs):
         user = get_object_or_404(User, username=username)
         user_request = request.user
-        posts = Post.objects.filter(author=user)
+        posts = Post.objects.filter(author=user).order_by('-created')
         subscribers_number = Subscription.objects.filter(author=user).count()
         subscription_number = Subscription.objects.filter(subscriber=user).count()
+
+        subscription = False
+        if user_request.is_authenticated and user.username != user_request.username:
+            subscription = True if len(Subscription.objects.filter(author=user, subscriber=user_request)) else False
 
         context = {
             'user': user,
@@ -21,25 +27,49 @@ class UserView(View):
             'posts': posts,
             'subscribers_number': subscribers_number,
             'subscription_number': subscription_number,
+            'subscription': subscription,
         }
 
         return render(request, self.template_name, context=context)
 
     def post(self, request, *args, **kwargs):
+        user = request.user
         if 'title' in request.POST and 'content' in request.POST:
             title = request.POST['title']
             content = request.POST['content']
-            user = request.user
+
 
             Post(title=title, content=content, author=user).save()
 
+        elif 'action' in request.POST:
+            author = request.POST['author']
+            subscriber = request.POST['subscriber']
+            author_obj = get_object_or_404(User, username=author)
+            subscriber_obj = get_object_or_404(User, username=subscriber)
+            action = request.POST['action']
+
+            if action == 'Subscribe':
+                Subscription(author=author_obj, subscriber=subscriber_obj).save()
+            elif action == 'Unsubscribe':
+                Subscription.objects.filter(author=author_obj, subscriber=subscriber_obj).delete()
+
+            return redirect('blog:user_view', username=author)
+
         return redirect('blog:user_view', username=user.username)
 
-class PostsView(View):
-    template_name = ''
+class PostsView(LoginRequiredMixin, View):
+    template_name = 'blog/blog_posts.html'
+    login_url = '/login/'
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        subscriptions = [subscription.author for subscription in Subscription.objects.filter(subscriber=user)]
+        posts = Post.objects.filter(author__in=subscriptions).order_by('-created')
 
-    def get(self, *args, **kwargs):
-        return
+        context = {
+            'posts': posts
+        }
 
-    def post(self, *args, **kwargs):
+        return render(request, self.template_name, context=context)
+
+    def post(self, request, *args, **kwargs):
         return
