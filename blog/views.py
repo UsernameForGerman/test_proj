@@ -1,10 +1,9 @@
-from django.shortcuts import render, get_object_or_404, get_list_or_404, redirect, reverse
-from django.http import HttpResponseRedirect, Http404, HttpResponse
-from django.urls import reverse_lazy
+from django.shortcuts import render, get_object_or_404, redirect
 from .models import Subscription, Post, User
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
-
+from .tasks import send_mail_delay
+from test_proj.settings import EMAIL_HOST_USER
 
 class UserView(View):
     template_name = 'blog/blog_user_account.html'
@@ -40,6 +39,13 @@ class UserView(View):
 
 
             Post(title=title, content=content, author=user).save()
+
+            email_html_path = 'blog/email_subscription.html'
+            text = 'New post'
+            topic = 'New post created!'
+            from_send = EMAIL_HOST_USER
+            to_send = [subscription.subscriber.email for subscription in Subscription.objects.filter(author=user)]
+            task = send_mail_delay.delay(email_html_path, from_send, to_send, topic, text)
 
         elif 'action' in request.POST:
             author = request.POST['author']

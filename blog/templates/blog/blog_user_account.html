@@ -18,14 +18,14 @@
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-post">
                         Post
                     </button>
-                {% elif user.is_authenticated and not subscription %}
+                {% elif requested_user.is_authenticated and not subscription %}
                     <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                         <input type="hidden" name="author" value="{{ user.username }}">
                         <input type="hidden" name="subscriber" value="{{ requested_user.username }}">
                         <input type="submit" name="action" value="Subscribe" class="btn btn-info">
                     </form>
-                {% elif user.is_authenticated and subscription %}
+                {% elif requested_user.is_authenticated and subscription %}
                     <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                         <input type="hidden" name="author" value="{{ user.username }}">

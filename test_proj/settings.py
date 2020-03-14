@@ -136,3 +136,20 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 LOGIN_URL = 'login/'
+
+# redis and celery related settings
+CELERY_BROKER_URL = 'redis://redis:6379'
+CELERY_RESULT_BACKEND = 'redis://redis:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+# email related settings
+# Email send
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = 'blog-proj@yandex.ru'
+EMAIL_HOST_PASSWORD = 'test_proj'
+EMAIL_USE_SSL = True
+
