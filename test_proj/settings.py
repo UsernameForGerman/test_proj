@@ -134,6 +134,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'blog/static'),
+]
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 LOGIN_URL = 'login/'
 
@@ -150,6 +155,10 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
 EMAIL_HOST_USER = 'blog-proj@yandex.ru'
-EMAIL_HOST_PASSWORD = 'test_proj'
+EMAIL_HOST_PASSWORD = 'blog_proj'
 EMAIL_USE_SSL = True
+
+# session related settings
+SESSION_COOKIE_AGE = 60*60*24*30    # one month
+
 

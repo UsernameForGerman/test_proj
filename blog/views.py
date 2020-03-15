@@ -10,17 +10,21 @@ class UserView(View):
 
 
     def get(self, request, username, *args, **kwargs):
-        user = get_object_or_404(User, username=username)
-        user_request = request.user
-        posts = Post.objects.filter(author=user).order_by('-created')
-        subscribers_number = Subscription.objects.filter(author=user).count()
-        subscription_number = Subscription.objects.filter(subscriber=user).count()
+        user_request = get_object_or_404(User, username=username)
+        user = request.user
+        posts = Post.objects.filter(author=user_request).order_by('-created')
+        subscribers_number = Subscription.objects.filter(author=user_request).count()
+        subscription_number = Subscription.objects.filter(subscriber=user_request).count()
 
         subscription = False
-        if user_request.is_authenticated and user.username != user_request.username:
-            subscription = True if len(Subscription.objects.filter(author=user, subscriber=user_request)) else False
+        if user.is_authenticated and user.username != user_request.username:
+            subscription = True if len(Subscription.objects.filter(author=user_request, subscriber=user)) else False
+
+        users = User.objects.exclude(username=request.user.username)
+
 
         context = {
+            'users': users,
             'user': user,
             'requested_user': user_request,
             'posts': posts,
@@ -40,12 +44,17 @@ class UserView(View):
 
             Post(title=title, content=content, author=user).save()
 
+            post_id = Post.objects.filter(title=title, content=content, author=user).order_by('-created')[0].id
             email_html_path = 'blog/email_subscription.html'
             text = 'New post'
             topic = 'New post created!'
             from_send = EMAIL_HOST_USER
             to_send = [subscription.subscriber.email for subscription in Subscription.objects.filter(author=user)]
-            task = send_mail_delay.delay(email_html_path, from_send, to_send, topic, text)
+            url = request.get_host() + '/posts' + '/{}'.format(post_id)
+            context = {
+                'url': url,
+            }
+            task = send_mail_delay.delay(email_html_path, from_send, to_send, topic, text, context)
 
         elif 'action' in request.POST:
             author = request.POST['author']
@@ -74,10 +83,43 @@ class PostsView(LoginRequiredMixin, View):
         user = request.user
         subscriptions = [subscription.author for subscription in Subscription.objects.filter(subscriber=user)]
         posts = Post.objects.filter(author__in=subscriptions).order_by('-created')
-        print([post.read_by.all() for post in posts])
+        users = User.objects.exclude(username=request.user.username)
+
         context = {
             'posts': posts,
             'user': user,
+            'users': users,
+        }
+
+        return render(request, self.template_name, context=context)
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        if 'read' in request.POST:
+            post_id = request.POST['post_id']
+
+            post = get_object_or_404(Post, id=post_id)
+            post.read_by.add(user)
+
+        return redirect('blog:posts_view')
+
+class MainPageView(View):
+    template_name = 'blog/main_page.html'
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('blog:posts_view')
+        else:
+            return render(request, self.template_name)
+
+class PostView(View):
+    template_name = 'blog/blog_post_view.html'
+
+    def get(self, request, post_id, *args, **kwargs):
+        post = get_object_or_404(Post, id=post_id)
+
+        context = {
+            'post': post,
         }
 
         return render(request, self.template_name, context=context)

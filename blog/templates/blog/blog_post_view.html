@@ -2,19 +2,12 @@
 
 {% block title %}
     <title>
-    Posts
+    {{ post.title }}
     </title>
 {% endblock %}
 
 {% block body %}
-    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-        <h1 class="display-4">Posts</h1>
-        <p class="lead">
-            You can easily mark posts as read
-        </p>
-    </div>
 <div class="container">
-{% for post in posts %}
     <hr>
     <div class="card">
 
@@ -40,6 +33,5 @@
         </div>
     </div>
 
-    {% endfor %}
 </div>
 {% endblock %}
