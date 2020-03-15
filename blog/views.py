@@ -57,6 +57,9 @@ class UserView(View):
             if action == 'Subscribe':
                 Subscription(author=author_obj, subscriber=subscriber_obj).save()
             elif action == 'Unsubscribe':
+                posts = Post.objects.filter(author=author_obj)
+                for post in posts:
+                    post.read_by.remove(subscriber_obj)
                 Subscription.objects.filter(author=author_obj, subscriber=subscriber_obj).delete()
 
             return redirect('blog:user_view', username=author)
@@ -66,16 +69,25 @@ class UserView(View):
 class PostsView(LoginRequiredMixin, View):
     template_name = 'blog/blog_posts.html'
     login_url = '/login/'
+
     def get(self, request, *args, **kwargs):
         user = request.user
         subscriptions = [subscription.author for subscription in Subscription.objects.filter(subscriber=user)]
         posts = Post.objects.filter(author__in=subscriptions).order_by('-created')
-
+        print([post.read_by.all() for post in posts])
         context = {
-            'posts': posts
+            'posts': posts,
+            'user': user,
         }
 
         return render(request, self.template_name, context=context)
 
     def post(self, request, *args, **kwargs):
-        return
+        user = request.user
+        if 'read' in request.POST:
+            post_id = request.POST['post_id']
+
+            post = get_object_or_404(Post, id=post_id)
+            post.read_by.add(user)
+
+        return redirect('blog:posts_view')

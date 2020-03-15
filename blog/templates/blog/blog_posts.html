@@ -15,6 +15,15 @@
 
         <div class="card-header">
             <a href="{% url 'blog:user_view' username=post.author.username %}">{{ post.author.username }}</a>
+            {% if user not in post.read_by.all %}
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="post_id" value="{{ post.id }}">
+                    <input type="submit" name='read' class="btn btn-secondary" value="Read">
+                </form>
+            {% else %}
+                <p>Post read</p>
+            {% endif %}
         </div>
         <div class="card-body">
             <h5 class="card-title">{{ post.title }}</h5>
