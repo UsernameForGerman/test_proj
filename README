@@ -5,7 +5,7 @@ To run server, you should run following commands:
 3) "Then you creating super user"
 4) docker-compose up
 
-If you have problems with email send, change mail server.  Here is how to do it:
+If you have problems with email send(like spam errors caused by mail server), change mail server.  Here is how to do it:
 - Go to test_proj/settings.py file
 - Change EMAIL_HOST to your mail server adress
 - Check EMAIL_PORT(for TSL connections)
