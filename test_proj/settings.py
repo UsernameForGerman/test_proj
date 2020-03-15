@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '#o0r^*^bwdmf-iw_1cl_dg$n3a2_2zq+39tsjka+f%xf)vfgvc'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 DOCKER = True
 
 ALLOWED_HOSTS = ['*']
@@ -134,3 +134,31 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'blog/static'),
+]
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+LOGIN_URL = 'login/'
+
+# redis and celery related settings
+CELERY_BROKER_URL = 'redis://redis:6379'
+CELERY_RESULT_BACKEND = 'redis://redis:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+# email related settings
+# Email send
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = 'blog-proj@yandex.ru'
+EMAIL_HOST_PASSWORD = 'blog_proj'
+EMAIL_USE_SSL = True
+
+# session related settings
+SESSION_COOKIE_AGE = 60*60*24*30    # one month
+
+

@@ -1,0 +1,16 @@
+To run server, you should run following commands:
+
+1) docker-compose build --no-cache
+2) sudo docker-compose run web python3 manage.py migrate && sudo docker-compose run web python3 manage.py createsuperuser
+3) "Then you creating super user"
+4) docker-compose up
+
+If you have problems with email send(like spam errors caused by mail server), change mail server.  Here is how to do it:
+- Go to test_proj/settings.py file
+- Change EMAIL_HOST to your mail server adress
+- Check EMAIL_PORT(for TSL connections)
+- Change EMAIL_HOST_USER to your username in mail server
+- Change EMAIL_HOST_PASSWORD to your password in mail server
+Example already given in settings.py file.
+
+Project created by Polyak German

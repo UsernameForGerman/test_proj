@@ -1,0 +1,45 @@
+{% extends 'blog/blog_main.html' %}
+
+{% block title %}
+    <title>
+    Posts
+    </title>
+{% endblock %}
+
+{% block body %}
+    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+        <h1 class="display-4">Posts</h1>
+        <p class="lead">
+            You can easily mark posts as read
+        </p>
+    </div>
+<div class="container">
+{% for post in posts %}
+    <hr>
+    <div class="card">
+
+        <div class="card-header">
+            <a href="{% url 'blog:user_view' username=post.author.username %}">{{ post.author.username }}</a>
+            {% if user not in post.read_by.all %}
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="post_id" value="{{ post.id }}">
+                    <input type="submit" name='read' class="btn btn-secondary" value="Read">
+                </form>
+            {% else %}
+                <p>Post read</p>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">{{ post.title }}</h5>
+
+            <p class="card-text">{{ post.content }}</p>
+        </div>
+        <div class="card-footer text-muted">
+            {{ post.created }}
+        </div>
+    </div>
+
+    {% endfor %}
+</div>
+{% endblock %}

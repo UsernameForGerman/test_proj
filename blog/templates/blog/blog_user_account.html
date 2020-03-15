@@ -2,7 +2,7 @@
 
 {% block title %}
     <title>
-    {{ user.username }}
+    {{ requested_user.username }}
     </title>
 {% endblock %}
 
@@ -13,29 +13,38 @@
                 <p>User</p>
             </div>
             <div class="card-body">
-                <h5 class="card-text">{{ user.username }}</h5>
+                <h5 class="card-text">{{ requested_user.username }}</h5>
                 {% if user.username == requested_user.username %}
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-post">
                         Post
                     </button>
+                {% elif user.is_authenticated and not subscription %}
+                    <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                        <input type="hidden" name="author" value="{{ requested_user.username }}">
+                        <input type="hidden" name="subscriber" value="{{ user.username }}">
+                        <input type="submit" name="action" value="Subscribe" class="btn btn-info">
+                    </form>
+                {% elif user.is_authenticated and subscription %}
+                    <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                        <input type="hidden" name="author" value="{{ requested_user.username }}">
+                        <input type="hidden" name="subscriber" value="{{ user.username }}">
+                        <input type="submit" name="action" value="Unsubscribe" class="btn btn-info">
+                    </form>
                 {% endif %}
             </div>
         </div>
         {% for post in posts %}
             <hr>
         <div class="card">
-        <!--
-            <div class="card-header">
-                <a href="{% url 'blog:user_view' username=post.author.username %}">{{ post.author.username }}</a>
-            </div>
-        -->
             <div class="card-body">
                 <h5 class="card-title">{{ post.title }}</h5>
 
                 <p class="card-text">{{ post.content }}</p>
             </div>
             <div class="card-footer text-muted">
-                {{ post.created }}
+                <p>{{ post.created }}</p>
             </div>
         </div>
 

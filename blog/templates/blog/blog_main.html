@@ -1,2 +1,48 @@
 {% extends 'main.html' %}
 
+{% block head_body %}
+    <style>
+        html {
+          font-size: 14px;
+        }
+        @media (min-width: 768px) {
+          html {
+            font-size: 16px;
+          }
+        }
+
+        .container {
+          max-width: 960px;
+        }
+
+        .pricing-header {
+          max-width: 700px;
+        }
+
+        .card-deck .card {
+          min-width: 220px;
+        }
+    </style>
+    <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+        <h5 class="my-0 mr-md-auto font-weight-normal">Blog</h5>
+        <nav class="my-2 my-md-0 mr-md-3">
+            <a class="p-2 text-dark" href="{% url 'blog:posts_view' %}">Posts</a>
+            <a class="p-2 text-dark" href="{% url 'blog:user_view' username=user.username %}">My blog</a>
+            <a class="p-2 text-dart">
+            <select class="mr-sm-2" id="user-picker" onchange="location = this.value;">
+                <option value="" disabled selected>Search...</option>
+                {% for user_i in users %}
+                <option value="{% url 'blog:user_view' username=user_i.username %}">{{ user_i.username }}</option>
+                {% endfor %}
+            </select>
+            </a>
+
+        </nav>
+        {% if user.is_authenticated %}
+        <a class="btn btn-outline-primary" href="{% url 'logout' %}?next=/login">Logout</a>
+        {% else %}
+        <a class="btn btn-outline-primary" href="{% url 'login' %}">Login</a>
+        {% endif %}
+    </div>
+
+{% endblock %}
