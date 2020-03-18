@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+os.environ['DJANGO_SETTINGS_MODULE'] = 'test_proj.settings'
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -33,6 +34,7 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'blog.apps.BlogConfig',
+    'celery.contrib.testing',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -81,11 +83,11 @@ WSGI_APPLICATION = 'test_proj.wsgi.application'
 if DOCKER:
     DATABASES = {
         'default': {
-	    'ENGINE': 'django.db.backends.postgresql',
-	    'NAME': 'postgres',
-	    'USER': 'postgres',
-	    'HOST': 'db',
-	    'PORT': 5432,
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'postgres',
+            'USER': 'postgres',
+            'HOST': 'db',
+            'PORT': 5432,
         }
     }
 else:
