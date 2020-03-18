@@ -3,7 +3,9 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils import translation
 
-@app.task
+
+
+@app.task()
 def send_mail_delay(template_path: str, from_mail: str, emails: list, topic: str, text: str, context: dict):
 
     # translation.activate(language)

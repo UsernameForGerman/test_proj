@@ -10,9 +10,10 @@ class PostAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         user = obj.author
+
         super().save_model(request, obj, form, change)
 
-        post_id = Post.objects.filter(title=obj.title, content=obj.content, author=user).order_by('-created')[0].id
+        post_id = obj.id
 
         email_html_path = 'blog/email_subscription.html'
         text = 'New post'

@@ -19,17 +19,13 @@
                         Post
                     </button>
                 {% elif user.is_authenticated and not subscription %}
-                    <form method="post" enctype="multipart/form-data">
+                    <form method="post" action="{% url 'blog:user_view' username=requested_user %}" enctype="multipart/form-data">
                     {% csrf_token %}
-                        <input type="hidden" name="author" value="{{ requested_user.username }}">
-                        <input type="hidden" name="subscriber" value="{{ user.username }}">
                         <input type="submit" name="action" value="Subscribe" class="btn btn-info">
                     </form>
                 {% elif user.is_authenticated and subscription %}
-                    <form method="post" enctype="multipart/form-data">
+                    <form method="post" action="{% url 'blog:user_view' username=requested_user %}" enctype="multipart/form-data">
                     {% csrf_token %}
-                        <input type="hidden" name="author" value="{{ requested_user.username }}">
-                        <input type="hidden" name="subscriber" value="{{ user.username }}">
                         <input type="submit" name="action" value="Unsubscribe" class="btn btn-info">
                     </form>
                 {% endif %}
@@ -57,7 +53,7 @@
 <div class="modal fade" id="modal-post" tabindex="-1" role="dialog" aria-labelledby="modal-post" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
-            <form method="post" enctype="multipart/form-data">
+            <form method="post" action="{% url 'blog:user_view' username=requested_user %}" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="modal-header">
                     <h5 class="modal-title">Post</h5>

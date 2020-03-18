@@ -1,0 +1,6 @@
+__pycache__
+.idea
+.cache
+.pytest_cache
+htmlcov
+db.sqlite3
